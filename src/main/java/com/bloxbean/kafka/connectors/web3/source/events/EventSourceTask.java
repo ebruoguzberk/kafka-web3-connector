@@ -55,7 +55,7 @@ public class EventSourceTask extends SourceTask {
             // we haven't fetched anything yet, so we initialize to START_BLOCK
             blockNumberOffset = config.getStartBlock();
         } else {
-            String lastFetchedBlockNumber = (String)lastSourceOffset.get(LAST_FETCHED_BLOCK_NUMBER);
+            String lastFetchedBlockNumber = (String)lastSourceOffset.get(config.getChainName() + "_" +  LAST_FETCHED_BLOCK_NUMBER);
             if(lastFetchedBlockNumber != null && lastFetchedBlockNumber.length() > 0)
                 blockNumberOffset = Long.parseLong(lastFetchedBlockNumber) + 1;
             else
@@ -200,7 +200,7 @@ public class EventSourceTask extends SourceTask {
 
     private Map<String, String> sourcePartition() {
         Map<String, String> map = new HashMap<>();
-        map.put(WEB3_RPC_URL, config.getWeb3RpcUrl());
+        map.put(config.getTopic()+"_"+WEB3_RPC_URL, config.getWeb3RpcUrl());
         return map;
     }
 

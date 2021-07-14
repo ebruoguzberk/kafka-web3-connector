@@ -20,18 +20,19 @@ public class BlockSourceConfig extends AbstractConfig {
 
     public static ConfigDef conf() {
         final ConfigDef configDef = new ConfigDef();
-        configDef.define(WEB3_RPC_URL, org.apache.kafka.common.config.ConfigDef.Type.STRING, "http://localhost:8545", org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "Web3 rpc address (http://<host>:<port>)");
-        configDef.define(TOPIC, org.apache.kafka.common.config.ConfigDef.Type.STRING, "", org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "Destination topic for Blocks");
-        configDef.define(TRANSACTION_TOPIC, org.apache.kafka.common.config.ConfigDef.Type.STRING, "", org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "Destination topic for Transactions");
-        configDef.define(START_BLOCK, ConfigDef.Type.LONG, 0, org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "Start Block Number");
-        configDef.define(BLOCK_TIME_IN_SEC, ConfigDef.Type.INT, 10, org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "Block time in sec");
-        configDef.define(NO_BLOCKS_FOR_FINALITY, ConfigDef.Type.INT, 0, org.apache.kafka.common.config.ConfigDef.Importance.HIGH, "No of blocks to wait for finality");
+        configDef.define(WEB3_RPC_URL, ConfigDef.Type.STRING, "http://localhost:8545", ConfigDef.Importance.HIGH, "Web3 rpc address (http://<host>:<port>)");
+        configDef.define(TOPIC, ConfigDef.Type.STRING, "", ConfigDef.Importance.HIGH, "Destination topic for Blocks");
+        configDef.define(TRANSACTION_TOPIC, ConfigDef.Type.STRING, "", ConfigDef.Importance.HIGH, "Destination topic for Transactions");
+        configDef.define(START_BLOCK, ConfigDef.Type.LONG, 0, ConfigDef.Importance.HIGH, "Start Block Number");
+        configDef.define(BLOCK_TIME_IN_SEC, ConfigDef.Type.INT, 10, ConfigDef.Importance.HIGH, "Block time in sec");
+        configDef.define(NO_BLOCKS_FOR_FINALITY, ConfigDef.Type.INT, 0, ConfigDef.Importance.HIGH, "No of blocks to wait for finality");
+        configDef.define(CHAIN_NAME, ConfigDef.Type.STRING, "", ConfigDef.Importance.HIGH, "SKALE Chain Name will be used as high watermark in topic");
 
         configDef.define(IGNORE_BLOCK_FIELDS, ConfigDef.Type.LIST, IGNORE_BLOCK_FIELDS,
-                org.apache.kafka.common.config.ConfigDef.Importance.HIGH,
+                ConfigDef.Importance.HIGH,
                 "Comma separated list of block fields to exclude");
         configDef.define(IGNORE_TRANSACTION_FILEDS, ConfigDef.Type.LIST, IGNORE_TRANSACTION_FILEDS,
-                org.apache.kafka.common.config.ConfigDef.Importance.HIGH,
+                ConfigDef.Importance.HIGH,
                 "Comma separated list of transaction fields to exclude");
 
         return configDef;
@@ -82,5 +83,9 @@ public class BlockSourceConfig extends AbstractConfig {
             return new HashSet<>(keys);
         else
             return Collections.EMPTY_SET;
+    }
+
+    public String getChainName() {
+        return getString(CHAIN_NAME);
     }
 }
