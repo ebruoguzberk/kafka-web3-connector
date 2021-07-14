@@ -162,8 +162,6 @@ public class BlockSourceTask extends SourceTask {
 
         if (config.isSeparateTransactionTopic() && blockStruct.getTransactions() != null && blockStruct.getTransactions().size() > 0) {
             List<Struct> transactions = blockStruct.getTransactions();
-            logger.info("\n\n\n COME OOONNNNN ------> "+transactions.size()+" \n\n\n");
-
             for(Struct transaction: transactions) {
                 SourceRecord transactionRecord = new SourceRecord(
                         sourcePartition(),
