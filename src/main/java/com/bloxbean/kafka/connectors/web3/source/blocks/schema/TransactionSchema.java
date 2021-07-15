@@ -22,10 +22,11 @@ public class TransactionSchema {
     public static final String V = "v";
     public static final String R = "r";
     public static final String S = "s";
+    public static final String CHAIN_NAME = "chainName";
 
     public final static Schema SCHEMA = SchemaBuilder.struct().name("com.bloxbean.kafka.connectors.web3.source.schema.Transaction")
             .field(BLOCK_HASH, Schema.OPTIONAL_STRING_SCHEMA)
-            .field(BLOCK_NUMBER, Schema.OPTIONAL_INT64_SCHEMA)
+            .field(BLOCK_NUMBER, Schema.OPTIONAL_STRING_SCHEMA)
             .field(FROM, Schema.OPTIONAL_STRING_SCHEMA)
             .field(TO, Schema.OPTIONAL_STRING_SCHEMA)
             .field(NRG, Schema.OPTIONAL_STRING_SCHEMA) //Quntity
@@ -34,13 +35,14 @@ public class TransactionSchema {
             .field(GAS_PRICE, Schema.OPTIONAL_STRING_SCHEMA) //Quntity
             .field(HASH, Schema.OPTIONAL_STRING_SCHEMA)
             .field(INPUT, Schema.OPTIONAL_STRING_SCHEMA)
-            .field(NONCE, Schema.OPTIONAL_INT64_SCHEMA)
-            .field(TRANSACTION_INDEX, Schema.OPTIONAL_INT64_SCHEMA)
+            .field(NONCE, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(TRANSACTION_INDEX, Schema.OPTIONAL_STRING_SCHEMA)
             .field(VALUE, Schema.OPTIONAL_STRING_SCHEMA) //Quntity
-            .field(TIMESTAMP, Schema.OPTIONAL_INT64_SCHEMA)
+            .field(TIMESTAMP, Schema.OPTIONAL_STRING_SCHEMA)
             .field(V, Schema.OPTIONAL_STRING_SCHEMA)
             .field(R, Schema.OPTIONAL_STRING_SCHEMA)
             .field(S, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(CHAIN_NAME, Schema.OPTIONAL_STRING_SCHEMA)
             .build();
 
 

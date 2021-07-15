@@ -144,7 +144,7 @@ public class BlockSourceTask extends SourceTask {
 
     private List<SourceRecord> generateSourceRecords(JSONObject blockJson, long blockNumberOffset, long timestamp) {
 
-        ParsedBlockStruct blockStruct = blockConverter.convertFromJSON(blockJson, config.isSeparateTransactionTopic(), ignoredBlockFields, ignoreTransactionFields);
+        ParsedBlockStruct blockStruct = blockConverter.convertFromJSON(blockJson, config.isSeparateTransactionTopic(), ignoredBlockFields, ignoreTransactionFields,config.getChainName() );
         List<SourceRecord> sourceRecords = new ArrayList();
 
         SourceRecord blockRecord = new SourceRecord(
@@ -162,7 +162,9 @@ public class BlockSourceTask extends SourceTask {
 
         if (config.isSeparateTransactionTopic() && blockStruct.getTransactions() != null && blockStruct.getTransactions().size() > 0) {
             List<Struct> transactions = blockStruct.getTransactions();
+
             for(Struct transaction: transactions) {
+
                 SourceRecord transactionRecord = new SourceRecord(
                         sourcePartition(),
                         sourceOffset(blockNumberOffset),

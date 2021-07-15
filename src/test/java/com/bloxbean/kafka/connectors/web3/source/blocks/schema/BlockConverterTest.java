@@ -26,7 +26,7 @@ class BlockConverterTest {
 
         //When
         BlockConverter blockConverter = new BlockConverter();
-        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), new HashSet<>()).getBlock();
+        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), new HashSet<>(),"").getBlock();
 
         //then
         assertEquals(blockJson.getLong(NUMBER), struct.getInt64(NUMBER).longValue());
@@ -107,7 +107,7 @@ class BlockConverterTest {
 
         //When
         BlockConverter blockConverter = new BlockConverter();
-        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), new HashSet<>()).getBlock();
+        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), new HashSet<>(),"").getBlock();
 
         //then
         assertEquals(blockJson.getLong(NUMBER), struct.getInt64(NUMBER).longValue());
@@ -170,7 +170,7 @@ class BlockConverterTest {
 
         //When
         BlockConverter blockConverter = new BlockConverter();
-        Struct struct = blockConverter.convertFromJSON(blockJson, true, new HashSet<>(), new HashSet<>()).getBlock();
+        Struct struct = blockConverter.convertFromJSON(blockJson, true, new HashSet<>(), new HashSet<>(),"").getBlock();
 
         //then
         assertEquals(blockJson.getLong(NUMBER), struct.getInt64(NUMBER).longValue());
@@ -205,7 +205,7 @@ class BlockConverterTest {
 
         //When
         BlockConverter blockConverter = new BlockConverter();
-        Struct struct = blockConverter.convertFromJSON(blockJson, true, ignoreBlockFields, new HashSet<>()).getBlock();
+        Struct struct = blockConverter.convertFromJSON(blockJson, true, ignoreBlockFields, new HashSet<>(),"").getBlock();
 
         //then
         assertEquals(blockJson.getLong(NUMBER), struct.getInt64(NUMBER).longValue());
@@ -232,7 +232,7 @@ class BlockConverterTest {
 
         //When
         BlockConverter blockConverter = new BlockConverter();
-        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), ignoreTransactionFields).getBlock();
+        Struct struct = blockConverter.convertFromJSON(blockJson, false, new HashSet<>(), ignoreTransactionFields,"").getBlock();
 
         //then
         assertEquals(blockJson.getLong(NUMBER), struct.getInt64(NUMBER).longValue());

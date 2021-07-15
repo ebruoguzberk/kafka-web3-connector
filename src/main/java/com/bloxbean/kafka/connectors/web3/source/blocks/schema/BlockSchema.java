@@ -29,6 +29,7 @@ public class BlockSchema {
     public static final String MAIN_CHAIN = "mainChain";
     public static final String TRANSACTIONS = "transactions";
     public  static final String TRANSACTION_HASHES = "transaction_hashes" ;
+    public static final String CHAIN_NAME = "chainName";
 
     public static Schema SCHEMA = SchemaBuilder.struct().name("com.bloxbean.kafka.connectors.web3.source.schema.Block")
             .field(NUMBER, Schema.OPTIONAL_INT64_SCHEMA)
@@ -57,9 +58,10 @@ public class BlockSchema {
             .field(SIGNATURE, Schema.OPTIONAL_STRING_SCHEMA)
             .field(PUBLIC_KEY, Schema.OPTIONAL_STRING_SCHEMA)
             .field(MAIN_CHAIN, Schema.OPTIONAL_STRING_SCHEMA)
-
+            .field(CHAIN_NAME, Schema.OPTIONAL_STRING_SCHEMA)
             .field(TRANSACTIONS,
                     SchemaBuilder.array(TransactionSchema.SCHEMA).name("transactions").build())
             .field(TRANSACTION_HASHES, SchemaBuilder.array(Schema.STRING_SCHEMA).build())
+
             .build();
 }

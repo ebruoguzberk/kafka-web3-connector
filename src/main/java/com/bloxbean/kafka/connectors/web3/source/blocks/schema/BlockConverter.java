@@ -16,7 +16,7 @@ import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToLongValu
 
 public class BlockConverter {
 
-    public ParsedBlockStruct convertFromJSON(JSONObject blockJson, boolean publishTransactionsSeparately, Set<String> ignoreBlockFields, Set<String> ignoreTransactionFields) {
+    public ParsedBlockStruct convertFromJSON(JSONObject blockJson, boolean publishTransactionsSeparately, Set<String> ignoreBlockFields, Set<String> ignoreTransactionFields,String chainName) {
         ParsedBlockStruct result = new ParsedBlockStruct();
 
         Struct blockStruct = new Struct(BlockSchema.SCHEMA);
@@ -71,6 +71,9 @@ public class BlockConverter {
         if (!ignoreBlockFields.contains(MAIN_CHAIN))
             blockStruct.put(MAIN_CHAIN, blockJson.optString(MAIN_CHAIN));
 
+        blockStruct.put(CHAIN_NAME, chainName);
+
+
         String blockHash = blockStruct.getString(HASH);
         JSONArray txnArray = blockJson.optJSONArray(TRANSACTIONS);
         if (txnArray != null) {
@@ -80,7 +83,7 @@ public class BlockConverter {
                 JSONObject txnJson = txnArray.getJSONObject(i);
 
                 if (!ignoreBlockFields.contains(TRANSACTIONS)) {
-                    Struct txnStruct = TransactionConverter.convertFromJSON(blockHash, txnJson, ignoreTransactionFields);
+                    Struct txnStruct = TransactionConverter.convertFromJSON(blockHash, txnJson, ignoreTransactionFields, hexToBigIntegerStr(blockJson.optString(TIMESTAMP)),chainName);
                     txnStructs.add(txnStruct);
                 }
 
