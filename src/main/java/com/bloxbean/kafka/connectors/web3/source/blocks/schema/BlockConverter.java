@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.BlockSchema.*;
+import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.TransactionSchema.TIMESTAMP;
 import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToBigIntegerStr;
 import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToLongValue;
 
@@ -22,7 +23,8 @@ public class BlockConverter {
         Struct blockStruct = new Struct(BlockSchema.SCHEMA);
 
         if (!ignoreBlockFields.contains(NUMBER))
-            blockStruct.put(NUMBER, blockJson.optLong(NUMBER));
+
+            blockStruct.put(NUMBER, hexToBigIntegerStr(blockJson.optString(NUMBER)));
         if (!ignoreBlockFields.contains(HASH))
             blockStruct.put(HASH, blockJson.optString(HASH));
         if (!ignoreBlockFields.contains(PARENT_HASH))
@@ -58,7 +60,7 @@ public class BlockConverter {
             blockStruct.put(NRG_USED, hexToBigIntegerStr(blockJson.optString(NRG_USED)));
 
         if (!ignoreBlockFields.contains(TIMESTAMP))
-            blockStruct.put(TIMESTAMP, hexToLongValue(blockJson.optString(TIMESTAMP)));
+            blockStruct.put(TIMESTAMP,  hexToBigIntegerStr(blockJson.optString(TIMESTAMP)));
 
         if (!ignoreBlockFields.contains(SEED))
             blockStruct.put(SEED, blockJson.optString(SEED));
