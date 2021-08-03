@@ -12,7 +12,6 @@ import java.util.Set;
 import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.BlockSchema.*;
 import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.TransactionSchema.TIMESTAMP;
 import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToBigIntegerStr;
-import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToLongValue;
 
 
 public class BlockConverter {
@@ -81,6 +80,8 @@ public class BlockConverter {
         if (txnArray != null) {
             List<Struct> txnStructs = new ArrayList<>();
             List<String> txnHashes = new ArrayList<>();
+            blockStruct.put(BlockSchema.TRANSACTION_COUNT,  txnArray.length() + "");
+
             for (int i = 0; i < txnArray.length(); i++) {
                 JSONObject txnJson = txnArray.getJSONObject(i);
 
@@ -105,6 +106,9 @@ public class BlockConverter {
                 blockStruct.put(TRANSACTION_HASHES, Collections.EMPTY_LIST);
 
             result.setTransactions(txnStructs);
+        }
+        else {
+            blockStruct.put(BlockSchema.TRANSACTION_COUNT, "0");
         }
 
         result.setBlock(blockStruct);

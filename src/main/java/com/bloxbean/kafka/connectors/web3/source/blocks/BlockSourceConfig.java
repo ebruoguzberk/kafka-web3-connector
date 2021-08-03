@@ -27,7 +27,7 @@ public class BlockSourceConfig extends AbstractConfig {
         configDef.define(BLOCK_TIME_IN_SEC, ConfigDef.Type.INT, 10, ConfigDef.Importance.HIGH, "Block time in sec");
         configDef.define(NO_BLOCKS_FOR_FINALITY, ConfigDef.Type.INT, 0, ConfigDef.Importance.HIGH, "No of blocks to wait for finality");
         configDef.define(CHAIN_NAME, ConfigDef.Type.STRING, "", ConfigDef.Importance.HIGH, "SKALE Chain Name will be used as high watermark in topic");
-
+        configDef.define(RESET, ConfigDef.Type.BOOLEAN, true,ConfigDef.Importance.MEDIUM, "start producer from beginning");
         configDef.define(IGNORE_BLOCK_FIELDS, ConfigDef.Type.LIST, IGNORE_BLOCK_FIELDS,
                 ConfigDef.Importance.HIGH,
                 "Comma separated list of block fields to exclude");
@@ -87,5 +87,9 @@ public class BlockSourceConfig extends AbstractConfig {
 
     public String getChainName() {
         return getString(CHAIN_NAME);
+    }
+
+    public Boolean getReset() {
+        return getBoolean(RESET);
     }
 }

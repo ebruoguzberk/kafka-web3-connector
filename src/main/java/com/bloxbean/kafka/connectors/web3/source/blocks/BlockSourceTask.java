@@ -52,6 +52,11 @@ public class BlockSourceTask extends SourceTask {
     }
 
     private void initializeLastVariables() {
+//        if(config.getReset())
+//        {
+//            blockNumberOffset = config.getStartBlock();
+//        }
+//        else {
         //Initialize variables for the last run
         Map<String, Object> lastSourceOffset = null;
         lastSourceOffset = context.offsetStorageReader().offset(sourcePartition());
@@ -60,14 +65,16 @@ public class BlockSourceTask extends SourceTask {
             blockNumberOffset = config.getStartBlock();
         } else {
             logger.info("KEYz1 = " + config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER);
-            String lastFetchedBlockNumber = (String)lastSourceOffset.get( config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER);
+            String lastFetchedBlockNumber = (String) lastSourceOffset.get(config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER);
             logger.info(lastFetchedBlockNumber);
-            if(lastFetchedBlockNumber != null && lastFetchedBlockNumber.length() > 0)
+            if (lastFetchedBlockNumber != null && lastFetchedBlockNumber.length() > 0)
                 blockNumberOffset = Long.parseLong(lastFetchedBlockNumber) + 1;
             else
                 blockNumberOffset = config.getStartBlock();
 //                throw new Web3ConnectorException(String.format("Invalid last fetched block number : %s", lastFetchedBlockNumber));
+//            }
         }
+        logger.info("\n\n\n blockNumberOffset" + blockNumberOffset);
         newBlockWaitTime = config.getBlockTime() * 1000;
         ignoredBlockFields = config.getIgnoreBlockFields();
         ignoreTransactionFields = config.getIgnoreTransactionFields();
