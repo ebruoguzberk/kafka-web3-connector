@@ -10,19 +10,20 @@ import java.util.List;
 import java.util.Set;
 
 import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.BlockSchema.*;
+import static com.bloxbean.kafka.connectors.web3.source.blocks.schema.TransactionSchema.TIMESTAMP;
 import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToBigIntegerStr;
-import static com.bloxbean.kafka.connectors.web3.util.HexConverter.hexToLongValue;
 
 
 public class BlockConverter {
 
-    public ParsedBlockStruct convertFromJSON(JSONObject blockJson, boolean publishTransactionsSeparately, Set<String> ignoreBlockFields, Set<String> ignoreTransactionFields) {
+    public ParsedBlockStruct convertFromJSON(JSONObject blockJson, boolean publishTransactionsSeparately, Set<String> ignoreBlockFields, Set<String> ignoreTransactionFields,String chainName) {
         ParsedBlockStruct result = new ParsedBlockStruct();
 
         Struct blockStruct = new Struct(BlockSchema.SCHEMA);
 
         if (!ignoreBlockFields.contains(NUMBER))
-            blockStruct.put(NUMBER, blockJson.optLong(NUMBER));
+
+            blockStruct.put(NUMBER, hexToBigIntegerStr(blockJson.optString(NUMBER)));
         if (!ignoreBlockFields.contains(HASH))
             blockStruct.put(HASH, blockJson.optString(HASH));
         if (!ignoreBlockFields.contains(PARENT_HASH))
@@ -58,7 +59,7 @@ public class BlockConverter {
             blockStruct.put(NRG_USED, hexToBigIntegerStr(blockJson.optString(NRG_USED)));
 
         if (!ignoreBlockFields.contains(TIMESTAMP))
-            blockStruct.put(TIMESTAMP, hexToLongValue(blockJson.optString(TIMESTAMP)));
+            blockStruct.put(TIMESTAMP,  hexToBigIntegerStr(blockJson.optString(TIMESTAMP)));
 
         if (!ignoreBlockFields.contains(SEED))
             blockStruct.put(SEED, blockJson.optString(SEED));
@@ -71,16 +72,21 @@ public class BlockConverter {
         if (!ignoreBlockFields.contains(MAIN_CHAIN))
             blockStruct.put(MAIN_CHAIN, blockJson.optString(MAIN_CHAIN));
 
+        blockStruct.put(CHAIN_NAME, chainName);
+
+
         String blockHash = blockStruct.getString(HASH);
         JSONArray txnArray = blockJson.optJSONArray(TRANSACTIONS);
         if (txnArray != null) {
             List<Struct> txnStructs = new ArrayList<>();
             List<String> txnHashes = new ArrayList<>();
+            blockStruct.put(BlockSchema.TRANSACTION_COUNT,  txnArray.length() + "");
+
             for (int i = 0; i < txnArray.length(); i++) {
                 JSONObject txnJson = txnArray.getJSONObject(i);
 
                 if (!ignoreBlockFields.contains(TRANSACTIONS)) {
-                    Struct txnStruct = TransactionConverter.convertFromJSON(blockHash, txnJson, ignoreTransactionFields);
+                    Struct txnStruct = TransactionConverter.convertFromJSON(blockHash, txnJson, ignoreTransactionFields, hexToBigIntegerStr(blockJson.optString(TIMESTAMP)),chainName);
                     txnStructs.add(txnStruct);
                 }
 
@@ -100,6 +106,9 @@ public class BlockConverter {
                 blockStruct.put(TRANSACTION_HASHES, Collections.EMPTY_LIST);
 
             result.setTransactions(txnStructs);
+        }
+        else {
+            blockStruct.put(BlockSchema.TRANSACTION_COUNT, "0");
         }
 
         result.setBlock(blockStruct);

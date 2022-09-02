@@ -1,13 +1,15 @@
 package com.bloxbean.kafka.connectors.web3.source.blocks;
 
+import com.bloxbean.kafka.connectors.web3.client.Web3RpcClient;
+import com.bloxbean.kafka.connectors.web3.exception.Web3ConnectorException;
 import com.bloxbean.kafka.connectors.web3.exception.Web3Exception;
 import com.bloxbean.kafka.connectors.web3.source.blocks.schema.BlockConverter;
 import com.bloxbean.kafka.connectors.web3.source.blocks.schema.BlockSchema;
 import com.bloxbean.kafka.connectors.web3.source.blocks.schema.ParsedBlockStruct;
 import com.bloxbean.kafka.connectors.web3.source.blocks.schema.TransactionSchema;
-import com.bloxbean.kafka.connectors.web3.util.*;
-import com.bloxbean.kafka.connectors.web3.client.Web3RpcClient;
-import com.bloxbean.kafka.connectors.web3.exception.Web3ConnectorException;
+import com.bloxbean.kafka.connectors.web3.util.ConfigConstants;
+import com.bloxbean.kafka.connectors.web3.util.HexConverter;
+import com.bloxbean.kafka.connectors.web3.util.StringUtil;
 import kong.unirest.json.JSONObject;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
@@ -15,11 +17,10 @@ import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.*;
 
 import static com.bloxbean.kafka.connectors.web3.util.ConfigConstants.LAST_FETCHED_BLOCK_NUMBER;
-import static com.bloxbean.kafka.connectors.web3.util.ConfigConstants.*;
+import static com.bloxbean.kafka.connectors.web3.util.ConfigConstants.WEB3_RPC_URL;
 
 public class BlockSourceTask extends SourceTask {
     private static Logger logger = LoggerFactory.getLogger(BlockSourceTask.class);
@@ -51,6 +52,11 @@ public class BlockSourceTask extends SourceTask {
     }
 
     private void initializeLastVariables() {
+//        if(config.getReset())
+//        {
+//            blockNumberOffset = config.getStartBlock();
+//        }
+//        else {
         //Initialize variables for the last run
         Map<String, Object> lastSourceOffset = null;
         lastSourceOffset = context.offsetStorageReader().offset(sourcePartition());
@@ -58,18 +64,24 @@ public class BlockSourceTask extends SourceTask {
             // we haven't fetched anything yet, so we initialize to START_BLOCK
             blockNumberOffset = config.getStartBlock();
         } else {
-            String lastFetchedBlockNumber = (String)lastSourceOffset.get(LAST_FETCHED_BLOCK_NUMBER);
-            if(lastFetchedBlockNumber != null && lastFetchedBlockNumber.length() > 0)
+            logger.info("KEYz1 = " + config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER);
+            String lastFetchedBlockNumber = (String) lastSourceOffset.get(config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER);
+            logger.info(lastFetchedBlockNumber);
+            if (lastFetchedBlockNumber != null && lastFetchedBlockNumber.length() > 0)
                 blockNumberOffset = Long.parseLong(lastFetchedBlockNumber) + 1;
             else
-                throw new Web3ConnectorException(String.format("Invalid last fetched block number : %s", lastFetchedBlockNumber));
+                blockNumberOffset = config.getStartBlock();
+//                throw new Web3ConnectorException(String.format("Invalid last fetched block number : %s", lastFetchedBlockNumber));
+//            }
         }
+        logger.info("\n\n\n blockNumberOffset" + blockNumberOffset);
         newBlockWaitTime = config.getBlockTime() * 1000;
         ignoredBlockFields = config.getIgnoreBlockFields();
         ignoreTransactionFields = config.getIgnoreTransactionFields();
     }
 
     public List<SourceRecord> poll() throws InterruptedException {
+
         try {
             if(!canContinue(blockNumberOffset)) {//Wait. May be finality not reached.
                 Thread.sleep(newBlockWaitTime);
@@ -139,7 +151,7 @@ public class BlockSourceTask extends SourceTask {
 
     private List<SourceRecord> generateSourceRecords(JSONObject blockJson, long blockNumberOffset, long timestamp) {
 
-        ParsedBlockStruct blockStruct = blockConverter.convertFromJSON(blockJson, config.isSeparateTransactionTopic(), ignoredBlockFields, ignoreTransactionFields);
+        ParsedBlockStruct blockStruct = blockConverter.convertFromJSON(blockJson, config.isSeparateTransactionTopic(), ignoredBlockFields, ignoreTransactionFields,config.getChainName() );
         List<SourceRecord> sourceRecords = new ArrayList();
 
         SourceRecord blockRecord = new SourceRecord(
@@ -148,7 +160,7 @@ public class BlockSourceTask extends SourceTask {
                 config.getTopic(),
                 null, // partition will be inferred by the framework
                 null,
-                String.valueOf(blockNumberOffset),
+                config.getChainName()+"_"+blockNumberOffset,
                 BlockSchema.SCHEMA,
                 blockStruct.getBlock(),
                 timestamp
@@ -157,14 +169,16 @@ public class BlockSourceTask extends SourceTask {
 
         if (config.isSeparateTransactionTopic() && blockStruct.getTransactions() != null && blockStruct.getTransactions().size() > 0) {
             List<Struct> transactions = blockStruct.getTransactions();
+
             for(Struct transaction: transactions) {
+
                 SourceRecord transactionRecord = new SourceRecord(
                         sourcePartition(),
                         sourceOffset(blockNumberOffset),
                         config.getTrasactionTopic(),
                         null, // partition will be inferred by the framework
                         null,
-                        String.valueOf(transaction.getString(TransactionSchema.HASH)),
+                        config.getChainName() + "_"+ transaction.getString(TransactionSchema.HASH),
                         TransactionSchema.SCHEMA,
                         transaction,
                         timestamp
@@ -178,13 +192,13 @@ public class BlockSourceTask extends SourceTask {
 
     private Map<String, String> sourcePartition() {
         Map<String, String> map = new HashMap<>();
-        map.put(WEB3_RPC_URL, config.getWeb3RpcUrl());
+        map.put(config.getTopic() + "_" + WEB3_RPC_URL, config.getWeb3RpcUrl());
         return map;
     }
 
     private Map<String, String> sourceOffset(long blockNumber) {
         Map<String, String> map = new HashMap<>();
-        map.put(LAST_FETCHED_BLOCK_NUMBER, String.valueOf(blockNumber));
+        map.put(config.getChainName() + "_" + LAST_FETCHED_BLOCK_NUMBER, String.valueOf(blockNumber));
         return map;
     }
 

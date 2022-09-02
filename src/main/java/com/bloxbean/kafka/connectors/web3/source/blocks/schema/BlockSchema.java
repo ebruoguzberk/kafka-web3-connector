@@ -29,9 +29,11 @@ public class BlockSchema {
     public static final String MAIN_CHAIN = "mainChain";
     public static final String TRANSACTIONS = "transactions";
     public  static final String TRANSACTION_HASHES = "transaction_hashes" ;
+    public static final String CHAIN_NAME = "chainName";
+    public static final String TRANSACTION_COUNT = "transactionCount";
 
     public static Schema SCHEMA = SchemaBuilder.struct().name("com.bloxbean.kafka.connectors.web3.source.schema.Block")
-            .field(NUMBER, Schema.OPTIONAL_INT64_SCHEMA)
+            .field(NUMBER, Schema.OPTIONAL_STRING_SCHEMA)
             .field(HASH, Schema.OPTIONAL_STRING_SCHEMA)
             .field(PARENT_HASH, Schema.OPTIONAL_STRING_SCHEMA)
             .field(LOGS_BLOOM, Schema.OPTIONAL_STRING_SCHEMA)
@@ -50,16 +52,17 @@ public class BlockSchema {
             .field(GAS_USED, Schema.OPTIONAL_STRING_SCHEMA)  //Quantity
             .field(NRG_LIMIT, Schema.OPTIONAL_STRING_SCHEMA) //Quantity
             .field(NRG_USED, Schema.OPTIONAL_STRING_SCHEMA)  //Quantity
-            .field(TIMESTAMP, Schema.OPTIONAL_INT64_SCHEMA)
-
+            .field(TIMESTAMP, Schema.OPTIONAL_STRING_SCHEMA)
             .field(SEED, Schema.OPTIONAL_STRING_SCHEMA)
             .field(SEAL_TYPE, Schema.OPTIONAL_STRING_SCHEMA)
             .field(SIGNATURE, Schema.OPTIONAL_STRING_SCHEMA)
             .field(PUBLIC_KEY, Schema.OPTIONAL_STRING_SCHEMA)
             .field(MAIN_CHAIN, Schema.OPTIONAL_STRING_SCHEMA)
-
+            .field(CHAIN_NAME, Schema.OPTIONAL_STRING_SCHEMA)
             .field(TRANSACTIONS,
                     SchemaBuilder.array(TransactionSchema.SCHEMA).name("transactions").build())
             .field(TRANSACTION_HASHES, SchemaBuilder.array(Schema.STRING_SCHEMA).build())
+            .field(TRANSACTION_COUNT, Schema.OPTIONAL_STRING_SCHEMA)
+
             .build();
 }

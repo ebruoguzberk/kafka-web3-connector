@@ -12,6 +12,7 @@ public final class ConfigConstants {
     public static final String START_BLOCK = "start_block";
     public static final String BLOCK_TIME_IN_SEC = "block_time";
     public static final String NO_BLOCKS_FOR_FINALITY="no_of_blocks_for_finality";
+    public static final String CHAIN_NAME = "chain_name";
 
     public static final String LAST_FETCHED_BLOCK_NUMBER = "last_fetched_block_number";
 
